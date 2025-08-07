@@ -1,0 +1,62 @@
+
+# .replit - Discord Voice Leaderboard Bot Configuration
+
+# กำหนดคำสั่งที่จะรันเมื่อกดปุ่ม Run
+run = "node index.js"
+
+# กำหนดค่าสำหรับ Deployment
+[deployment]
+run = "node index.js"
+deploymentTarget = "cloudrun"
+
+# กำหนดค่าพอร์ตสำหรับ Web Interface
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+# กำหนดเวอร์ชันของ Node.js
+[nix]
+channel = "stable-23_05"
+
+# กำหนด Environment Variables
+[env]
+PATH = "/home/runner/.nix-profile/bin:/home/runner/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+NODE_ENV = "production"
+
+# กำหนดค่า Packager
+[packager]
+language = "nodejs"
+
+[packager.features]
+packageSearch = true
+guessImports = true
+enabledForHosting = false
+
+[workflows]
+runButton = "Start Discord Bot"
+
+[[workflows.workflow]]
+name = "Start Bot"
+author = 46063075
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node index.js"
+
+[[workflows.workflow]]
+name = "Start Discord Bot"
+author = 46063075
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node index.js"
