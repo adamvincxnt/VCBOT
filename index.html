@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>PUBG DOGX Voice Leaderboard</title>
+
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" sizes="32x32" href="https://media.discordapp.net/attachments/1138011760423604305/1138480554480775289/Dog_Gaming_Logo_2.png?ex=6894b9a4&is=68936824&hm=8d4c1e7c29e547e8fd377bef0a8e34e5c69184cb323785056563e947cdd1d771&=&format=webp&quality=lossless">
+        <link rel="icon" type="image/png" sizes="16x16" href="https://media.discordapp.net/attachments/1138011760423604305/1138480554480775289/Dog_Gaming_Logo_2.png?ex=6894b9a4&is=68936824&hm=8d4c1e7c29e547e8fd377bef0a8e34e5c69184cb323785056563e947cdd1d771&=&format=webp&quality=lossless">
+        <link rel="apple-touch-icon" sizes="180x180" href="https://media.discordapp.net/attachments/1138011760423604305/1138480554480775289/Dog_Gaming_Logo_2.png?ex=6894b9a4&is=68936824&hm=8d4c1e7c29e547e8fd377bef0a8e34e5c69184cb323785056563e947cdd1d771&=&format=webp&quality=lossless">
+        <link rel="shortcut icon" href="https://media.discordapp.net/attachments/1138011760423604305/1138480554480775289/Dog_Gaming_Logo_2.png?ex=6894b9a4&is=68936824&hm=8d4c1e7c29e547e8fd377bef0a8e34e5c69184cb323785056563e947cdd1d771&=&format=webp&quality=lossless">
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.4/socket.io.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PUBG DOGX Voice Leaderboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.4/socket.io.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Whitney', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #2c2f33 0%, #23272a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header Section */
+        .header {
+            background: linear-gradient(45deg, #7289da, #5865f2);
+            padding: 2rem 0;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .clan-logo {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background-color: transparent; /* เปลี่ยนเป็นตรงนี้แทน */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem auto;
+            border: 6px solid #FFD700;
+            box-shadow: 0 12px 35px rgba(255, 215, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .clan-logo::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+            animation: shine 3s infinite;
+        }
+
+        .clan-logo .logo-text {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #FFD700;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8);
+            z-index: 1;
+        }
+
+        .clan-logo.has-image .logo-text {
+            display: none;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        /* Credit Section */
+        .credit-section {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem 0;
+            text-align: center;
+            border-bottom: 1px solid #40444b;
+        }
+
+        .credit-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #FFD700;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            letter-spacing: 1px;
+        }
+
+        .credit-text .highlight {
+            color: #ff6b6b;
+            text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #36393f;
+            padding: 1rem;
+            margin: 2rem;
+            border-radius: 10px;
+            border-left: 4px solid #FFD700;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .status-item {
+            text-align: center;
+            padding: 1rem;
+            background: #2c2f33;
+            border-radius: 8px;
+            border: 1px solid #40444b;
+        }
+
+        .status-item .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-item .label {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-bottom: 0.3rem;
+        }
+
+        .status-item .value {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #FFD700;
+        }
+
+        /* Server Selection */
+        .server-selector {
+            margin: 2rem;
+            background: #36393f;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .server-selector h3 {
+            margin-bottom: 1rem;
+            color: #FFD700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .server-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .server-card {
+            background: #2c2f33;
+            border: 2px solid #40444b;
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .server-card:hover {
+            border-color: #7289da;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(114, 137, 218, 0.3);
+        }
+
+        .server-card.active {
+            border-color: #FFD700;
+            background: linear-gradient(45deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
+        }
+
+        .server-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .server-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #7289da;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .server-details h4 {
+            margin-bottom: 0.3rem;
+        }
+
+        .server-details p {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        /* Leaderboard */
+        .leaderboard {
+            margin: 2rem;
+            background: #36393f;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .leaderboard-header {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            padding: 1.5rem;
+            text-align: center;
+            color: #000;
+        }
+
+        .leaderboard-header h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .leaderboard-content {
+            padding: 1.5rem;
+        }
+
+        /* Updated Leaderboard Layout - 2 Columns */
+        .users-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .user-item {
+            background: #2c2f33;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-item:hover {
+            background: #32353b;
+            transform: translateX(5px);
+        }
+
+        .user-item.rank-1 { 
+            border-left-color: #FFD700;
+            background: linear-gradient(90deg, rgba(255, 215, 0, 0.1), #2c2f33);
+        }
+        .user-item.rank-2 { 
+            border-left-color: #C0C0C0;
+            background: linear-gradient(90deg, rgba(192, 192, 192, 0.1), #2c2f33);
+        }
+        .user-item.rank-3 { 
+            border-left-color: #CD7F32;
+            background: linear-gradient(90deg, rgba(205, 127, 50, 0.1), #2c2f33);
+        }
+
+        .rank-badge {
+            font-size: 1.5rem;
+            font-weight: bold;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid #40444b;
+            object-fit: cover;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .user-time {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .voice-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .voice-online {
+            background: #3ba55d;
+            color: white;
+        }
+
+        .voice-offline {
+            background: #747f8d;
+            color: white;
+        }
+
+        /* Role Badges */
+        .role-badge {
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-left: 0.3rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Discord Default Role Colors */
+        .role-default { background: #99aab5; color: #2c2f33; }
+        .role-red { background: #ed4245; color: white; }
+        .role-pink { background: #eb459e; color: white; }
+        .role-fuchsia { background: #eb459e; color: white; }
+        .role-purple { background: #9c59b6; color: white; }
+        .role-blue { background: #3498db; color: white; }
+        .role-green { background: #57f287; color: #2c2f33; }
+        .role-yellow { background: #fee75c; color: #2c2f33; }
+        .role-orange { background: #f1c40f; color: #2c2f33; }
+        .role-brown { background: #a0522d; color: white; }
+        .role-light-grey { background: #95a5a6; color: #2c2f33; }
+        .role-dark-grey { background: #607d8b; color: white; }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #40444b;
+            border-top: 4px solid #FFD700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            opacity: 0.7;
+            grid-column: 1 / -1;
+        }
+
+        .empty-state .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            opacity: 0.5;
+            border-top: 1px solid #40444b;
+            margin-top: 3rem;
+        }
+
+        .footer .credit {
+            font-size: 1rem;
+            margin-top: 0.5rem;
+            color: #FFD700;
+            font-weight: 600;
+        }
+
+        .footer .credit .highlight {
+            color: #ff6b6b;
+            text-shadow: 0 0 8px rgba(255, 107, 107, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2rem; }
+            .clan-logo { width: 120px; height: 120px; }
+            .clan-logo .logo-text { font-size: 2rem; }
+            .status-grid { grid-template-columns: 1fr; }
+            .server-list { flex-direction: column; }
+            .users-grid { grid-template-columns: 1fr; }
+            .user-item { flex-direction: column; text-align: center; gap: 0.5rem; }
+            .user-info { text-align: center; }
+            .user-name { justify-content: center; }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #2c2f33;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #40444b;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555860;
+        }
+    </style>
+</head>
+<body>
+       <!-- Header LOGO -->
+       <div class="header">
+           <div class="clan-logo" id="clan-logo" style="background-image: url('https://media.discordapp.net/attachments/1138011760423604305/1138480554480775289/Dog_Gaming_Logo_2.png?ex=6894b9a4&is=68936824&hm=8d4c1e7c29e547e8fd377bef0a8e34e5c69184cb323785056563e947cdd1d771&=&format=webp&quality=lossless'); background-size: cover; background-position: center; background-repeat: no-repeat; background-color: transparent;">
+               <div class="logo-text" style="display: none;">A</div>
+           </div>
+           <h1>🏆 Voice Leaderboard</h1>
+           <p class="subtitle">PUBG DOGX Clan • Real-time Voice Chat Statistics</p>
+       </div>
+
+    <!-- Credit Section -->
+    <div class="credit-section">
+        <div class="credit-text">
+            UI Design & Discord Bot BY <span class="highlight">**! Welcome**</span>
+        </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="status-grid">
+            <div class="status-item">
+                <div class="icon">🤖</div>
+                <div class="label">Bot Status</div>
+                <div class="value" id="bot-status">เริ่มต้นระบบ...</div>
+            </div>
+            <div class="status-item">
+                <div class="icon">🌐</div>
+                <div class="label">Total Servers</div>
+                <div class="value" id="total-servers">-</div>
+            </div>
+            <div class="status-item">
+                <div class="icon">👥</div>
+                <div class="label">Active Users</div>
+                <div class="value" id="active-users">-</div>
+            </div>
+            <div class="status-item">
+                <div class="icon">⏰</div>
+                <div class="label">Total Voice Time</div>
+                <div class="value" id="total-time">-</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Server Selection -->
+    <div class="server-selector">
+        <h3>🎮 Select Server</h3>
+        <div class="server-list" id="server-list">
+            <!-- Servers will be populated dynamically -->
+        </div>
+    </div>
+
+    <!-- Leaderboard -->
+    <div class="leaderboard">
+        <div class="leaderboard-header">
+            <h2>👑 Voice Chat Champions</h2>
+            <p id="current-server">Select a server to view leaderboard</p>
+        </div>
+        <div class="leaderboard-content" id="leaderboard-content">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>กำลังโหลดข้อมูล...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>🚀 PUBG DOGX Voice Leaderboard Bot • Made with ❤️ for the clan</p>
+        <p>📡 Real-time updates via WebSocket • Last update: <span id="last-update">-</span></p>
+        <div class="credit">
+            Created BY <span class="highlight">**! Welcome**</span>
+        </div>
+    </div>
+
+    <script>
+        class VoiceLeaderboard {
+            constructor() {
+                this.socket = io();
+                this.currentGuild = null;
+                this.guildsData = {};
+                this.setupSocketEvents();
+                this.setupUI();
+            }
+
+            setupSocketEvents() {
+                this.socket.on('connect', () => {
+                    console.log('🌐 Connected to server');
+                    this.updateBotStatus('🟢 Connected', '#3ba55d');
+                    this.socket.emit('requestData');
+                });
+
+                this.socket.on('disconnect', () => {
+                    console.log('❌ Disconnected from server');
+                    this.updateBotStatus('🔴 Disconnected', '#ed4245');
+                });
+
+                this.socket.on('leaderboardUpdate', (data) => {
+                    console.log('📡 Received leaderboard update', data);
+                    this.handleLeaderboardUpdate(data);
+                });
+
+                this.socket.on('botStatus', (status) => {
+                    if (!status.isReady) {
+                        this.updateBotStatus('⏳ ' + status.message, '#faa61a');
+                    }
+                });
+            }
+
+            setupUI() {
+                // Request data every 30 seconds
+                setInterval(() => {
+                    if (this.socket.connected) {
+                        this.socket.emit('requestData');
+                    }
+                }, 30000);
+            }
+
+            handleLeaderboardUpdate(data) {
+                this.guildsData = data.guilds || {};
+
+                this.updateBotStatus('🟢 Online', '#3ba55d');
+                this.updateStatusBar(data);
+                this.updateServerList();
+                this.updateLastUpdateTime();
+
+                // Update clan logo ก่อนเลือกเซิร์ฟเวอร์
+                this.updateClanLogo();
+
+                // Auto-select first server if none selected
+                if (!this.currentGuild && Object.keys(this.guildsData).length > 0) {
+                    const firstGuildId = Object.keys(this.guildsData)[0];
+                    this.selectServer(firstGuildId);
+                }
+
+                if (this.currentGuild && this.guildsData[this.currentGuild]) {
+                    this.updateLeaderboard(this.guildsData[this.currentGuild]);
+                }
+            }
+
+            updateClanLogo() {
+                const clanLogo = document.getElementById('clan-logo');
+                const defaultLogoUrl = "https://media.discordapp.net/attachments/1138011760423604305/1138480554480775289/Dog_Gaming_Logo_2.png?ex=6894b9a4&is=68936824&hm=8d4c1e7c29e547e8fd377bef0a8e34e5c69184cb323785056563e947cdd1d771&=&format=webp&quality=lossless"; // ใส่ลิงก์เดียวกับข้างบน
+
+                // ใช้โลโก้เริ่มต้นเสมอ ไม่เปลี่ยนตาม guild LOGO
+                clanLogo.style.backgroundImage = `url(${defaultLogoUrl})`;
+                clanLogo.style.backgroundColor = 'transparent';
+                clanLogo.classList.add('has-image');
+                console.log('Using fixed logo:', defaultLogoUrl);
+            }
+
+            updateBotStatus(text, color) {
+                const statusElement = document.getElementById('bot-status');
+                statusElement.textContent = text;
+                statusElement.style.color = color;
+            }
+
+            updateStatusBar(data) {
+                document.getElementById('total-servers').textContent = data.totalGuilds || 0;
+
+                const totalActive = Object.values(this.guildsData).reduce((sum, guild) => sum + guild.activeUsers, 0);
+                document.getElementById('active-users').textContent = totalActive;
+
+                const totalTime = Object.values(this.guildsData).reduce((sum, guild) => sum + guild.totalTime, 0);
+                document.getElementById('total-time').textContent = this.formatTime(totalTime);
+            }
+
+            updateServerList() {
+                const serverList = document.getElementById('server-list');
+                serverList.innerHTML = '';
+
+                Object.entries(this.guildsData).forEach(([guildId, guild]) => {
+                    const serverCard = document.createElement('div');
+                    serverCard.className = `server-card ${this.currentGuild === guildId ? 'active' : ''}`;
+                    serverCard.onclick = () => this.selectServer(guildId);
+
+                    serverCard.innerHTML = `
+                        <div class="server-info">
+                            <div class="server-icon">
+                                ${guild.guildIcon ? `<img src="${guild.guildIcon}" style="width:100%; height:100%; border-radius:50%;">` : guild.guildName.charAt(0)}
+                            </div>
+                            <div class="server-details">
+                                <h4>${guild.guildName}</h4>
+                                <p>👥 ${guild.users.length} สมาชิก • 🔊 ${guild.activeUsers} ออนไลน์</p>
+                            </div>
+                        </div>
+                    `;
+
+                    serverList.appendChild(serverCard);
+                });
+            }
+
+            selectServer(guildId) {
+                this.currentGuild = guildId;
+                const guild = this.guildsData[guildId];
+
+                // Update server selection UI
+                document.querySelectorAll('.server-card').forEach(card => {
+                    card.classList.remove('active');
+                });
+                event.target.closest('.server-card').classList.add('active');
+
+                // Update leaderboard header
+                document.getElementById('current-server').textContent = guild.guildName;
+
+                // Update clan logo to match selected server (โลโก้บนสุด)
+                this.updateClanLogo();
+
+                // Update leaderboard content
+                this.updateLeaderboard(guild);
+            }
+
+            updateLeaderboard(guild) {
+                const content = document.getElementById('leaderboard-content');
+
+                if (!guild.users || guild.users.length === 0) {
+                    content.innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon">🎤</div>
+                            <h3>ยังไม่มีข้อมูล</h3>
+                            <p>ยังไม่มีสมาชิกในเซิร์ฟเวอร์นี้</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Split users into 2 columns
+                const halfLength = Math.ceil(guild.users.length / 2);
+                const leftColumn = guild.users.slice(0, halfLength);
+                const rightColumn = guild.users.slice(halfLength);
+
+                const createUserItemHTML = (user) => {
+                    let rankIcon = '';
+                    let rankClass = '';
+
+                    if (user.currentTotal > 0) {
+                        if (user.rank === 1) {
+                            rankIcon = '🥇';
+                            rankClass = 'rank-1';
+                        } else if (user.rank === 2) {
+                            rankIcon = '🥈';
+                            rankClass = 'rank-2';
+                        } else if (user.rank === 3) {
+                            rankIcon = '🥉';
+                            rankClass = 'rank-3';
+                        } else {
+                            rankIcon = `#${user.rank}`;
+                        }
+                    } else {
+                        rankIcon = '👤';
+                    }
+
+                    // สร้าง role badges
+                    const roleBadges = user.roles ? user.roles.map(role => 
+                        `<span class="role-badge role-${role.colorClass}">${role.name}</span>`
+                    ).join('') : '';
+
+                    return `
+                        <div class="user-item ${rankClass} fade-in">
+                            <div class="rank-badge">${rankIcon}</div>
+                            <img src="${user.avatarURL}" alt="${user.displayName}" class="user-avatar" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCA1MCA1MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjUiIGN5PSIyNSIgcj0iMjUiIGZpbGw9IiM3Mjg5ZGEiLz4KPHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCA1MCA1MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPC9zdmc+'">
+                            <div class="user-info">
+                                <div class="user-name">
+                                    ${user.displayName}
+                                    ${roleBadges}
+                                    <span class="voice-status ${user.isInVoice ? 'voice-online' : 'voice-offline'}">
+                                        ${user.isInVoice ? '🔊 ออนไลน์' : '⚪ ออฟไลน์'}
+                                    </span>
+                                </div>
+                                <div class="user-time">⏰ ${user.timeFormatted}</div>
+                            </div>
+                        </div>
+                    `;
+                };
+
+                const leftColumnHTML = leftColumn.map(createUserItemHTML).join('');
+                const rightColumnHTML = rightColumn.map(createUserItemHTML).join('');
+
+                content.innerHTML = `
+                    <div class="users-grid">
+                        <div class="column">
+                            ${leftColumnHTML}
+                        </div>
+                        <div class="column">
+                            ${rightColumnHTML}
+                        </div>
+                    </div>
+                `;
+            }
+
+            updateLastUpdateTime() {
+                const now = new Date().toLocaleString('th-TH');
+                document.getElementById('last-update').textContent = now;
+            }
+
+            formatTime(ms) {
+                if (!ms || ms < 1000) return "0 วินาที";
+
+                const seconds = Math.floor(ms / 1000);
+                const minutes = Math.floor(seconds / 60);
+                const hours = Math.floor(minutes / 60);
+//                const days = Math.floor(hours / 24);
+
+//                if (days > 0) return `${days} วัน ${hours % 24} ชั่วโมง`;
+                if (hours > 0) return `${hours} ชั่วโมง ${minutes % 60} นาที`;
+                if (minutes > 0) return `${minutes} นาที`;
+                return `${seconds} วินาที`;
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            new VoiceLeaderboard();
+        });
+    </script>
+</body>
+</html>
